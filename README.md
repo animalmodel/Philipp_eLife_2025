@@ -7,10 +7,10 @@
 ## Overview
 This repository contains the MATLAB analysis scripts used to generate the figures for the manuscript. The code analyzes EMG activity and muscle synergies in non-human primates before and after tendon transfer surgery.
 
-## ?? Data Availability
+## ğŸ“‚ Data Availability
 The dataset (EMG and Synergy matrices) required to run these scripts will be made available via Zenodo/GitHub shortly.
 
-## ?? Installation & Setup
+## âš™ï¸ Installation & Setup
 To run these scripts, you must maintain the following folder structure:
 
 1.  Download the `Codes/` folder from this repository.
@@ -19,19 +19,19 @@ To run these scripts, you must maintain the following folder structure:
 **Directory Structure:**
 ```text
 /Philipp_eLife_2025
-„¥„Ÿ„Ÿ Codes/
-„    „¥„Ÿ„Ÿ Figure5.m
-„    „¥„Ÿ„Ÿ ... (other scripts)
-„¥„Ÿ„Ÿ Data/
-„    „¥„Ÿ„Ÿ emg/
-„    „¥„Ÿ„Ÿ synergy/
-„    „¥„Ÿ„Ÿ behavior/
-„    „¥„Ÿ„Ÿ kinematics/
-„ 
-„¤„Ÿ„Ÿ README.md
+â”œâ”€â”€ Codes/
+â”‚   â”œâ”€â”€ Figure5.m
+â”‚   â”œâ”€â”€ ... (other scripts)
+â”œâ”€â”€ Data/
+â”‚   â”œâ”€â”€ emg/
+â”‚   â”œâ”€â”€ synergy/
+â”‚   â”œâ”€â”€ behavior/
+â”‚   â”œâ”€â”€ kinematics/
+â”‚
+â””â”€â”€ README.md
 
 
-?? List of Scripts (Current Release)
+ğŸ“œ List of Scripts (Current Release)
 Figure5.m: Behavioral and kinematic metrics
 Figure6.m: Temporal EMG profiles and CC
 Figure7.m: Primary Synergies (A/B) - Spatial structure & activation.
