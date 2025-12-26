@@ -26,7 +26,8 @@ Tensor Toolbox (Sandia National Labs)
 
 📂 Data Availability
 The full dataset required to run these scripts (including raw int16 EMG data, processed double arrays, and synergy matrices) is archived on Zenodo.
-Download the data here: [INSERT ZENODO LINK HERE]
+Download the data here: https://doi.org/10.5281/zenodo.18058525
+
 Please download the data and extract it into a folder named Data in the root directory of this repository.
 
 ⚙️ Installation & Setup
@@ -64,6 +65,7 @@ Figure10.m: Cross-correlation analysis of secondary synergy activation.
 Figure11.m: Aggregated and averaged EMG (aaEMG) analysis.
 Figure12.m: Kinematic analysis of joint angles (Monkey B).
 Figure13.m: Kinematic analysis showing gradual refinement of movement.
+
 Supplementary Figures
 FigureS1.m: Evolution of Time Lag at Peak CC (EMG).
 FigureS2.m: Comparison of EMG Patterns (Pre-surgery vs. Post-surgery).
@@ -79,5 +81,6 @@ FigureS9.m: Evolution of Time Lag at Peak CC (Synergy).
 © 2025 Roland Philipp. All rights reserved.
 Permission is hereby granted to use, reproduce, and modify this code and data for academic, educational, and other non-commercial research purposes only.
 This code and data are provided "as is", without warranty of any kind, express or implied. The authors shall not be liable for any damages arising from the use of this software.
+
 
 
