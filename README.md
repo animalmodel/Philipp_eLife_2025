@@ -36,18 +36,18 @@ Figure5.m: Behavioral and kinematic metrics
 Figure6.m: Temporal EMG profiles and CC
 Figure7.m: Primary Synergies (A/B) - Spatial structure & activation.
 Figure8.m: Secondary Synergies (C/D) - Spatial structure & activation.
-Figure9.m:  Cross-correlation analysis of primary synergy activation
-Figure10.m:  Cross-correlation analysis of secondary synergy activation
+Figure9.m: Cross-correlation analysis of primary synergy activation
+Figure10.m: Cross-correlation analysis of secondary synergy activation
 Figure11.m: Aggregated and averaged EMG (aaEMG)
-Figure12.m:  Kinematic analysis of joint angles (Monkey B)
+Figure12.m: Kinematic analysis of joint angles (Monkey B)
 Figure13.m: Kinematic analysis (gradual refinement)
 FigureS1.m: Evolution of Time Lag at Peak CC (EMG)
 FigureS2.m: EMG Patterns (Pre-surgery vs. Post-surgery).
 FigureS3.m: EMG Profiles for landmark days.
 FigureS4.m: Cross-correlation of EMG profiles.
-
-
+FigureS5.m: VAF plots
 FigureS6.m: Synergy weights for all sessions.
 FigureS7.m: Time-varying activation profiles.
 FigureS8.m: Synergy activation comparison (Pre vs. Final).
 FigureS9.m: Evolution of Time Lag at Peak CC (Synergy)
+
