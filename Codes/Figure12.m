@@ -1,23 +1,27 @@
 % =========================================================================
-% SCRIPT: Plot_Figure12_Kinematics.m
+% SCRIPT: Figure12.m (Kinematics)
 %
 % PURPOSE: 
 %   Generates Figure 12: Longitudinal Analysis of Joint Angles (Monkey B).
 %   Plots the Mean +/- SD of MCP and Wrist angles across specific days.
-%   Matches the style of the provided reference image (Red markers, error bars).
 %
-% INPUT FILES (Same as Fig 13):
+% INPUT FILES:
 %   - MP-joint_angles.xlsx (MCP Data)
 %   - MP-wrist_angles.xlsx (Wrist Data)
 %
-% AUTHOR: Roland
+% AUTHOR: Roland Philipp
 % =========================================================================
 
 clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+% --- DYNAMIC PATH SETUP ---
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % Input Directory (Shared with Figure 13)
 dataDir = fullfile(baseDir, 'Data', 'kinematics');
@@ -27,6 +31,11 @@ fileWrist = 'MP-wrist_angles.xlsx';
 % Output Directory
 outFigDir =  fullfile(baseDir, 'outputFigures_Fig12');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
+
+% Verify Data
+if ~exist(dataDir, 'dir')
+    error('Data folder not found at: %s\n(Did you download the ''Data'' folder from GitHub?)', dataDir); 
+end
 
 % Day Mappings (Monkey B)
 % Indices corresponding to columns in the Excel files
@@ -123,9 +132,6 @@ function plotKinematicPanel(ax, x, y, sd, tStr, yLbl, yLimVal)
     
   
     set(ax, 'FontSize', 12, 'TickDir', 'out', 'Box', 'off', 'LineWidth', 1.2);
-    
-    % Remove X-axis line between 0 and 20 to simulate break? 
-    % (Optional refinement, simple visual break provided above)
 end
 
 function addBracket(ax, x1, x2, yH, starStr)

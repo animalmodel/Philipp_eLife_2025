@@ -4,7 +4,6 @@
 % PURPOSE: 
 %   Generates Supplementary Figure S8: Pre vs Final-Day Synergy Profiles.
 %
-%
 % AUTHORS: Roland Philipp
 % =========================================================================
 
@@ -12,9 +11,12 @@ clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
 
-% This ensures it works on any computer without hardcoding 'C:\Users...'
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % Input Directory (Data/synergy)
 matDir = fullfile(baseDir, 'Data', 'synergy'); 
@@ -25,7 +27,7 @@ if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
 % Verify Data Path Exists
 if ~exist(matDir, 'dir')
-    error('Data folder not found at: %s\nPlease check directory structure.', matDir);
+    error('Data folder not found at: %s\nPlease check directory structure (Data/synergy).', matDir);
 end
 
 % Settings
@@ -173,10 +175,13 @@ hL.Position = [0.35, 0.02, 0.3, 0.05];
 
 % --- Export ---
 set(fig, 'PaperUnits', 'centimeters', 'PaperPositionMode', 'auto', 'PaperSize', [figWidth_cm figHeight_cm]);
-print(fig, fullfile(outFigDir, 'FigureS8_SynergyActivation.svg'), '-dsvg', '-painters');
-exportgraphics(fig, fullfile(outFigDir, 'FigureS8_SynergyActivation.png'), 'Resolution', 300);
-
-fprintf('Figure S8 saved to: %s\n', outFigDir);
+try
+    print(fig, fullfile(outFigDir, 'FigureS8_SynergyActivation.svg'), '-dsvg', '-painters');
+    fprintf('Saved SVG to: %s\n', outFigDir);
+catch
+    exportgraphics(fig, fullfile(outFigDir, 'FigureS8_SynergyActivation.png'), 'Resolution', 300);
+    fprintf('SVG failed. Saved PNG to: %s\n', outFigDir);
+end
 
 %% ========================================================================
 %  HELPER FUNCTIONS

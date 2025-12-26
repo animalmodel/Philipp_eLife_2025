@@ -1,10 +1,20 @@
 % =========================================================================
-% SCRIPT: PlotBehavioralRecovery.m
+% SCRIPT: Figure5.m (Behavioral Recovery)
 % AUTHOR: Roland Philipp
+%
+% UPDATED: Dynamic path detection for GitHub portability.
 % =========================================================================
 
 clear; close all; clc;
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+
+% --- DYNAMIC PATH SETUP ---
+% Automatically detects the folder this script is in (e.g., .../Codes)
+% and sets the base directory to the parent folder (e.g., .../Philipp_eLife_2025)
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 %% ========================================================================
 %  PART 1: MONKEY A
@@ -12,15 +22,17 @@ baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revisio
 disp('Processing Monkey A...');
 
 % --- PATHS ---
-
-
 dir_A_Main   = fullfile(baseDir, 'Data', 'behavior', 'data_M1');
 dir_A_Ataxia = fullfile(baseDir, 'Data', 'behavior', 'data_M1', 'real_mov_time - contains ATAXIA data');
 
 % 1. Load Main Timeline
-cd(dir_A_Main);
-daysFile = dir('daysoriginal.csv');
-days_A = csvread(daysFile.name, 0, 0);
+try
+    cd(dir_A_Main);
+    daysFile = dir('daysoriginal.csv');
+    days_A = csvread(daysFile.name, 0, 0);
+catch
+    error('Could not find Monkey A data. Check if ''Data'' folder is downloaded.');
+end
 
 % 2. Load Contact/Pull Data
 csvFiles = dir('Ya*.csv');

@@ -7,17 +7,22 @@
 % EXCLUSIONS (Monkey B): 
 %   - FDS, FCU, FCR (Missing/Excluded post-surgery data)
 %
-% AUTHORS: Roland Philipp
+% AUTHOR: Roland Philipp
 % =========================================================================
 
 clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
 scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
 baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
+
 matDir = fullfile(baseDir, 'Data', 'emg', 'emg_mat');
-outFigDir = fullfile(scriptPath, 'outputFigures_S4');
+outFigDir = fullfile(baseDir, 'outputFigures_S4');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
 if ~exist(matDir, 'dir'), error('Data directory not found: %s', matDir); end
@@ -56,8 +61,12 @@ processMonkey(T, 'Seseki', matDir, musclesB, musclesB, ttDateB, 13, 'Monkey B');
 
 
 % --- Finalize and Save ---
-exportgraphics(f, fullfile(outFigDir, 'FigureS4.png'), 'Resolution', 300);
-fprintf('Figure S4 saved to: %s\n', fullfile(outFigDir, 'FigureS4.png'));
+try
+    exportgraphics(f, fullfile(outFigDir, 'FigureS4.png'), 'Resolution', 300);
+    fprintf('Figure S4 saved to: %s\n', fullfile(outFigDir, 'FigureS4.png'));
+catch
+    fprintf('Warning: Could not save PNG. Check permissions.\n');
+end
 
 
 %% ========================================================================

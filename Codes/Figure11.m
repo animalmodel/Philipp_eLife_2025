@@ -1,5 +1,5 @@
 % =========================================================================
-% SCRIPT: Plot_aaEMG_with_Bars.m
+% SCRIPT: Figure11.m (Plot_aaEMG_with_Bars)
 %
 % Description:
 %   - Generates Figure 11: 4x4 Grid.
@@ -12,16 +12,23 @@ clear; clc; close all;
 
 %% 1. Configuration
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % --- PATHS ---
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
-
 matDirA = fullfile(baseDir, 'Data', 'emg', 'aggregated_EMG_data', 'M1');
 matDirB = fullfile(baseDir, 'Data', 'emg', 'aggregated_EMG_data', 'M2');
 behMainA = fullfile(baseDir, 'Data', 'behavior', 'data_M1');
 behSubA  = fullfile(baseDir, 'Data', 'behavior', 'data_M1', 'real_mov_time - contains ATAXIA data');
 behMainB = fullfile(baseDir, 'Data', 'behavior', 'data_M2');
 behSubB  = fullfile(baseDir, 'Data', 'behavior', 'data_M2', 'plateTouch');
+
+% Verify Paths
+if ~exist(matDirA, 'dir'), error('Data folder missing: %s', matDirA); end
 
 % --- LANDMARK DAYS (Indices for Bar Plots) ---
 % Derived from AccuEMG_new.m

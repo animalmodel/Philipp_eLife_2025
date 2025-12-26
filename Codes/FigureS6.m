@@ -22,10 +22,15 @@ clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
 scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
 baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
+
 matDir = fullfile(baseDir, 'Data', 'synergy'); 
-outFigDir = fullfile(scriptPath, 'outputFigures_S6');
+outFigDir = fullfile(baseDir, 'outputFigures_S6');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
 if ~exist(matDir, 'dir'), error('Data directory not found: %s', matDir); end
@@ -96,8 +101,12 @@ for i = 1:4
 end
 
 % --- Finalize and Save ---
-exportgraphics(f, fullfile(outFigDir, 'FigureS6.png'), 'Resolution', 300);
-fprintf('Figure S6 saved to: %s\n', fullfile(outFigDir, 'FigureS6.png'));
+try
+    exportgraphics(f, fullfile(outFigDir, 'FigureS6.png'), 'Resolution', 300);
+    fprintf('Figure S6 saved to: %s\n', fullfile(outFigDir, 'FigureS6.png'));
+catch
+    fprintf('Warning: Could not save PNG. Check permissions.\n');
+end
 
 
 %% ========================================================================

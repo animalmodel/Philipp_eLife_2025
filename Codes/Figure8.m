@@ -4,7 +4,9 @@
 % PURPOSE: 
 %   Generates Figure 8: Secondary Synergies (C & D).
 %   - Spatial Weights, Temporal Activation, Cosine Similarity.
-%   - UPDATES: Removed gray task-phase bars from activation plots.
+%   - UPDATES: Robust path detection added.
+%
+% LAYOUT: 5 Rows x 4 Columns
 %
 % AUTHOR: Roland Philipp
 % =========================================================================
@@ -13,13 +15,20 @@ clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
 scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
 baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
+
 matDir = fullfile(baseDir, 'Data', 'synergy'); 
 outFigDir = fullfile(baseDir, 'outputFigures_Fig8');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
-if ~exist(matDir, 'dir'), error('Data folder not found: %s', matDir); end
+if ~exist(matDir, 'dir')
+    error('Data folder not found at: %s\n(Did you download the ''Data'' folder from GitHub?)', matDir); 
+end
 
 monkeyNameList = {'Yachimun', 'Seseki'};
 synergyList    = {'C', 'D'}; 
@@ -98,9 +107,13 @@ for mIndx = 1:2
 end
 
 set(fig, 'PaperUnits', 'centimeters', 'PaperSize', [figWidth_cm figHeight_cm], 'PaperPositionMode', 'auto');
-print(fig, fullfile(outFigDir, 'Figure8_SecondarySynergies.svg'), '-dsvg', '-painters');
-exportgraphics(fig, fullfile(outFigDir, 'Figure8_SecondarySynergies.png'), 'Resolution', 300);
-fprintf('Figure 8 saved to: %s\n', outFigDir);
+try
+    print(fig, fullfile(outFigDir, 'Figure8_SecondarySynergies.svg'), '-dsvg', '-painters');
+    fprintf('Figure 8 saved to: %s\n', outFigDir);
+catch
+    exportgraphics(fig, fullfile(outFigDir, 'Figure8_SecondarySynergies.png'), 'Resolution', 300);
+    fprintf('SVG failed, saved as PNG to: %s\n', outFigDir);
+end
 
 %% ========================================================================
 %  HELPER FUNCTIONS (Same as Figure 7)

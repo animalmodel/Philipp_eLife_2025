@@ -8,19 +8,27 @@
 % LAYOUT (4 Rows x 4 Cols):
 %   - Rows: Synergies A, B, C, D
 %   - Col 1: Monkey A Pre (Mean +/- SD)
-%   - Col 2: Monkey A Post (All days, color-coded)
+%   - Col 2: Monkey A Post (All days, color-coded 'hot')
 %   - Col 3: Monkey B Pre (Mean +/- SD)
-%   - Col 4: Monkey B Post (All days, color-coded)
+%   - Col 4: Monkey B Post (All days, color-coded 'summer')
 %
-% AUTHORS: Roland Philipp
+% UPDATES:
+%   - Dynamic Y-axis limits (autoscales to max data value).
+%   - Square aspect ratio for better visibility.
+%
+% AUTHOR: Roland Philipp
 % =========================================================================
 
 clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
 scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
 baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % Force calculation type to Synergy
 calcType = 'Synergy';
@@ -29,7 +37,7 @@ calcType = 'Synergy';
 matDir = fullfile(baseDir, 'Data', 'synergy');
 
 % Set output directory
-outFigDir = fullfile(scriptPath, 'outputFigures_S7');
+outFigDir = fullfile(baseDir, 'outputFigures_S7');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
 % Verify data directory exists
@@ -38,227 +46,217 @@ if ~exist(matDir, 'dir')
 end
 
 monkeyNameList = {'Yachimun', 'Seseki'};
-focusList = {'A', 'B', 'C', 'D'}; % Synergies
+synergyList = {'A', 'B', 'C', 'D'};
 
-% Plotting colors
-colPreLine = [0.2, 0.2, 0.6];  % Dark purple/blue for mean line
-colPreFill = [0.4, 0.4, 0.8];  % Lighter purple/blue for shading
+% Dates
+ttDateA = datetime('2017-05-30','InputFormat','yyyy-MM-dd');
+ttDateB = datetime('2020-01-21','InputFormat','yyyy-MM-dd');
 
 % Figure Setup
-figWidth_cm = 24; figHeight_cm = 20; 
-f = figure('Name', 'Figure S7: Synergy Activation', 'Color', 'w', 'Units', 'centimeters', 'Position', [2, 2, figWidth_cm, figHeight_cm]);
+figWidth_cm = 28; figHeight_cm = 24; 
+f = figure('Name', 'Figure S7: Synergy Profiles', 'Color', 'w', 'Units', 'centimeters', 'Position', [2, 2, figWidth_cm, figHeight_cm]);
 T = tiledlayout(4, 4, 'TileSpacing', 'compact', 'Padding', 'compact');
 
-%% 2. MAIN LOOP
-% -------------------------------------------------------------------------
-for mIndx = 1:2
-    monkeyName = monkeyNameList{mIndx};
-    fprintf('Processing %s...\n', monkeyName);
+%% 2. MAIN LOOPS
+% =========================================================================
 
-    if mIndx == 1
-        ttDate = datetime('2017-05-30','InputFormat','yyyy-MM-dd');
-        figTitle = 'Monkey A';
-        % Custom Colormap: Red (early) to Black (late)
-        cMapBase = [1 0 0]; % Start Red
-        cMapEnd  = [0.2 0 0]; % End Dark Red/Black
-        colOffset = 0; % Plot in cols 1 & 2
-        cbarLabel = 'Post surgery days';
-    else
-        ttDate = datetime('2020-01-21','InputFormat','yyyy-MM-dd');
-        figTitle = 'Monkey B';
-        % Custom Colormap: Green (early) to Black (late)
-        cMapBase = [0 1 0]; % Start Green
-        cMapEnd  = [0 0.2 0]; % End Dark Green/Black
-        colOffset = 2; % Plot in cols 3 & 4
-        cbarLabel = 'Post surgery days';
-    end
+% --- Load Data ---
+fprintf('Loading Data...\n');
+dataPreA  = loadMatData('Yachimun', 'PreAll', matDir, synergyList, ttDateA);
+dataPostA = loadMatData('Yachimun', 'PostAll', matDir, synergyList, ttDateA);
+dataPreB  = loadMatData('Seseki', 'PreAll', matDir, synergyList, ttDateB);
+dataPostB = loadMatData('Seseki', 'PostAll', matDir, synergyList, ttDateB);
 
-    % --- Load Data ---
-    dataPre = loadMatData(calcType, monkeyName, 'PreAll', matDir, focusList, ttDate);
-    dataPost = loadMatData(calcType, monkeyName, 'PostAll', matDir, focusList, ttDate);
-
-    % --- Colormap Setup for Post-Surgery ---
-    allPostDays = [];
-    for i = 1:length(focusList)
-        allPostDays = [allPostDays, dataPost(i).daysDiff];
-    end
-    if isempty(allPostDays), dayRange = [0 1]; else, dayRange = [min(allPostDays), max(allPostDays)]; end
+% --- Plotting Rows (Synergies) ---
+for i = 1:4
+    synLabel = synergyList{i};
     
-    % Generate Gradient Colormap
-    nColors = 64;
-    cMap = [linspace(cMapBase(1), cMapEnd(1), nColors)', ...
-            linspace(cMapBase(2), cMapEnd(2), nColors)', ...
-            linspace(cMapBase(3), cMapEnd(3), nColors)'];
-
-    % --- Plotting Loop (Rows = Synergies) ---
-    for row = 1:4
-        synIdx = row;
-        synLabel = ['Synergy ' focusList{synIdx}];
-        
-        % =============================================================
-        % 1. Pre-Surgery Plot (Mean +/- SD) - Column 1 (or 3)
-        % =============================================================
-        axPre = nexttile((row - 1) * 4 + colOffset + 1);
-        hold(axPre, 'on');
-        
-        if ~isempty(dataPre(synIdx).dataM)
-            meanData = mean(dataPre(synIdx).dataM, 2, 'omitnan');
-            sdData = std(dataPre(synIdx).dataM, 0, 2, 'omitnan');
-            timeVec = dataPre(synIdx).t;
-            plotShadedError(axPre, timeVec, meanData, sdData, colPreLine, colPreFill);
-        end
-        
-        % Formatting
-        xline(axPre, 0, 'k--');
-        xlim(axPre, [-15, 15]);
-        ylabel(axPre, 'Amplitude [A.U.]', 'FontWeight', 'bold', 'FontSize', 9);
-        
-        % Text Label inside plot (Top Left)
-        text(axPre, 0.05, 0.9, synLabel, 'Units', 'normalized', 'FontWeight', 'bold', 'FontSize', 9);
-
-        if row < 4, set(axPre, 'XTickLabel', []); end
-        if row == 1
-             text(axPre, 0.5, 1.15, figTitle, 'Units', 'normalized', 'HorizontalAlignment', 'center', 'FontSize', 12, 'FontWeight', 'bold');
-        end
-
-        % =============================================================
-        % 2. Post-Surgery Plot (Individual Days) - Column 2 (or 4)
-        % =============================================================
-        axPost = nexttile((row - 1) * 4 + colOffset + 2);
-        hold(axPost, 'on');
-
-        if ~isempty(dataPost(synIdx).dataM)
-            numDays = size(dataPost(synIdx).dataM, 2);
-            for k = 1:numDays
-                dayVal = dataPost(synIdx).daysDiff(k);
-                colorIdx = round(((dayVal - dayRange(1)) / (dayRange(2) - dayRange(1))) * (nColors - 1)) + 1;
-                colorIdx = max(1, min(nColors, colorIdx)); 
-                thisColor = cMap(colorIdx, :);
-                plot(axPost, dataPost(synIdx).t, dataPost(synIdx).dataM(:, k), '-', 'Color', thisColor, 'LineWidth', 1);
-            end
-        end
-        
-        % Formatting
-        xline(axPost, 0, 'k--');
-        xlim(axPost, [-15, 15]);
-        set(axPost, 'YTickLabel', []);
-        if row < 4, set(axPost, 'XTickLabel', []); end
-        
-        % Axis Labels (Bottom Row Only)
-        if row == 4
-            xlabel(axPre, 'task range[%]', 'FontSize', 9);
-            xlabel(axPost, 'task range[%]', 'FontSize', 9);
-        end
-
-        % Colorbar (Last row, last column of the monkey block)
-        if row == 4
-            colormap(axPost, cMap); % Apply specific map to this axis
-            c = colorbar(axPost);
-            c.Label.String = cbarLabel;
-            cbarLimits = caxis(axPost); 
-            caxis(axPost, dayRange); 
-        end
+    % --- COL 1: Monkey A Pre ---
+    ax1 = nexttile(T, (i-1)*4 + 1);
+    plotPre(ax1, dataPreA(i), ['Synergy ' synLabel], i==1, 'Monkey A', [0.2 0.2 0.6], [0.4 0.4 0.8]);
+    
+    % --- COL 2: Monkey A Post ---
+    ax2 = nexttile(T, (i-1)*4 + 2);
+    plotPost(ax2, dataPostA(i), '', i==1, 'Post-Surgery', 'hot');
+    
+    % --- COL 3: Monkey B Pre ---
+    ax3 = nexttile(T, (i-1)*4 + 3);
+    plotPre(ax3, dataPreB(i), ['Synergy ' synLabel], i==1, 'Monkey B', [0.2 0.2 0.6], [0.4 0.4 0.8]);
+    
+    % --- COL 4: Monkey B Post ---
+    ax4 = nexttile(T, (i-1)*4 + 4);
+    plotPost(ax4, dataPostB(i), '', i==1, 'Post-Surgery', 'summer');
+    
+    % Match Y-Limits across the row for comparison
+    linkaxes([ax1, ax2, ax3, ax4], 'y');
+    
+    % Axis Labels (Bottom Row Only)
+    if i == 4
+        xlabel(ax1, '% Cycle'); xlabel(ax2, '% Cycle');
+        xlabel(ax3, '% Cycle'); xlabel(ax4, '% Cycle');
+    else
+        set(ax1,'XTickLabel',[]); set(ax2,'XTickLabel',[]);
+        set(ax3,'XTickLabel',[]); set(ax4,'XTickLabel',[]);
     end
 end
 
-% Save figure
-exportgraphics(f, fullfile(outFigDir, 'FigureS7.png'), 'Resolution', 300);
-fprintf('Figure S7 saved to: %s\n', fullfile(outFigDir, 'FigureS7.png'));
-
+% --- Finalize and Save ---
+try
+    exportgraphics(f, fullfile(outFigDir, 'FigureS7.png'), 'Resolution', 300);
+    fprintf('Figure S7 saved to: %s\n', fullfile(outFigDir, 'FigureS7.png'));
+catch
+    fprintf('Warning: Could not save PNG. Check permissions.\n');
+end
 
 %% ========================================================================
 %  HELPER FUNCTIONS
 % =========================================================================
 
-function plotShadedError(ax, x, yMean, ySD, lineCol, fillCol)
-    x = x(:)'; yMean = yMean(:)'; ySD = ySD(:)';
-    yUpper = yMean + ySD;
-    yLower = yMean - ySD;
-    xFill = [x, fliplr(x)];
-    yFill = [yUpper, fliplr(yLower)];
-    fill(ax, xFill, yFill, fillCol, 'EdgeColor', 'none', 'FaceAlpha', 0.5);
-    plot(ax, x, yMean, '-', 'Color', lineCol, 'LineWidth', 1.5);
+function plotPre(ax, dStruct, rowTitle, isTop, colTitle, colLine, colFill)
+    hold(ax, 'on');
+    xline(ax, 0, 'k:');
+    
+    maxY = 1.0; % Default fallback
+    
+    if ~isempty(dStruct.dataM)
+        meanData = mean(dStruct.dataM, 2, 'omitnan');
+        sdData   = std(dStruct.dataM, 0, 2, 'omitnan');
+        t        = dStruct.t;
+        
+        % Plot Tube
+        x = t(:)'; y = meanData(:)'; sd = sdData(:)';
+        fill(ax, [x, fliplr(x)], [y+sd, fliplr(y-sd)], colFill, 'FaceAlpha', 0.5, 'EdgeColor', 'none');
+        plot(ax, x, y, 'Color', colLine, 'LineWidth', 2);
+        
+        % Calculate Max for Scaling
+        maxY = max(y+sd, [], 'all', 'omitnan');
+    end
+    
+    % Styling
+    xlim(ax, [-15 15]);
+    
+    % Dynamic Y-Lim (with a minimum of 1.0)
+    finalY = max(1.2, maxY * 1.1);
+    ylim(ax, [0 finalY]); 
+    
+    ylabel(ax, rowTitle, 'FontWeight', 'bold', 'FontSize', 10);
+    
+    if isTop
+        title(ax, {colTitle, 'Pre-surgery'}, 'FontWeight', 'bold', 'FontSize', 11);
+    end
+    
+    box(ax, 'off'); set(ax, 'TickDir', 'out'); pbaspect(ax, [1 1 1]);
 end
 
-function dataAll = loadMatData(calcType, monkeyName, condition, matDir, focusList, ttDate)
-    matPath = fullfile(matDir, ['synergyData_' monkeyName '_' condition '.mat']);
+function plotPost(ax, dStruct, rowTitle, isTop, colTitle, cmapName)
+    hold(ax, 'on');
+    xline(ax, 0, 'k:');
     
-    if ~exist(matPath, 'file')
-         warning('Data file not found: %s', matPath);
-         dataAll = struct('t', [], 'dataM', [], 'daysDiff', []);
-         dataAll = repmat(dataAll, length(focusList), 1);
-         return;
-    end
-
-    dataFile = load(matPath, 'synergyData', 'percentTime', 'expDates', 'nameList');
-    dataCell = dataFile.synergyData; % Synergy data is usually {synergy x day}
+    maxY = 1.0; 
     
-    nList = length(focusList);
-    dataAll = struct([]);
-
-    for i = 1:nList
-        % Find index: In synergy files, nameList is usually {'A','B','C','D'}
-        idx = find(strcmp(focusList{i}, dataFile.nameList));
+    if ~isempty(dStruct.dataM)
+        nDays = size(dStruct.dataM, 2);
         
-        if isempty(idx)
-            dataAll(i).t = dataFile.percentTime;
-            dataAll(i).dataM = [];
-            dataAll(i).daysDiff = [];
-            continue;
-        end
-
-        t = dataFile.percentTime;
-        expDayString = cellstr(dataFile.expDates);
-        expDates = datetime(expDayString, 'InputFormat', 'yyMMdd');
-        daysDiff = days(expDates - ttDate);
-
-        numDays = length(expDates);
-        % Check data dimensions in first cell to init array
-        if numDays > 0 && ~isempty(dataCell{idx,1})
-             sz = size(dataCell{idx,1}, 2); % usually [1 x time] or [time x 1]
-             % We need standard length matching t
-             muscleDataM = zeros(length(t), numDays);
+        % Colormap
+        colormap(ax, cmapName);
+        cMap = colormap(ax);
+        nColors = size(cMap, 1);
+        
+        if nDays > 1
+             dayRange = [min(dStruct.daysDiff), max(dStruct.daysDiff)];
         else
-             muscleDataM = [];
+             dayRange = [0 1];
         end
         
-        validDays = false(1, numDays);
+        for k = 1:nDays
+            dayVal = dStruct.daysDiff(k);
+            % Map day to color
+            if diff(dayRange) == 0, cIdx = 1; 
+            else
+                cIdx = round( (dayVal - dayRange(1)) / diff(dayRange) * (nColors-1) ) + 1;
+            end
+            cIdx = max(1, min(nColors, cIdx));
+            
+            plot(ax, dStruct.t, dStruct.dataM(:, k), 'Color', cMap(cIdx,:), 'LineWidth', 1);
+        end
+        
+        % Colorbar (only for top plot to save space, or per plot)
+        if isTop
+             cb = colorbar(ax);
+             cb.Label.String = 'Days Post';
+             caxis(ax, dayRange);
+        end
+        
+        maxY = max(dStruct.dataM, [], 'all', 'omitnan');
+    end
+    
+    % Styling
+    xlim(ax, [-15 15]);
+    
+    finalY = max(1.2, maxY * 1.1);
+    ylim(ax, [0 finalY]);
+    
+    set(ax, 'YTickLabel', []);
+    
+    if isTop
+        title(ax, colTitle, 'FontWeight', 'bold', 'FontSize', 11);
+    end
+    
+    box(ax, 'off'); set(ax, 'TickDir', 'out'); pbaspect(ax, [1 1 1]);
+end
 
-        for dayI = 1:numDays
-            dailyData = dataCell{idx, dayI};
-            if ~isempty(dailyData)
-                % dailyData might be [trials x time] or [1 x time]
-                % We want mean across trials
-                if size(dailyData, 2) == length(t)
-                     % if [trials x time]
-                     meanProfile = mean(dailyData, 1, 'omitnan')';
-                elseif size(dailyData, 1) == length(t)
-                     % if [time x trials]
-                     meanProfile = mean(dailyData, 2, 'omitnan');
-                else
-                     % Try transposing
-                     if size(dailyData, 1) == length(t)
-                        meanProfile = mean(dailyData, 2, 'omitnan');
-                     else
-                        meanProfile = mean(dailyData, 1, 'omitnan')'; 
-                     end
+
+function dataAll = loadMatData(monkeyName, condition, matDir, focusList, ttDate)
+    fname = fullfile(matDir, ['synergyData_' monkeyName '_' condition '.mat']);
+    dataAll = repmat(struct('t',[], 'dataM',[], 'daysDiff',[]), 1, length(focusList));
+    
+    if ~exist(fname, 'file'), warning('File not found: %s', fname); return; end
+    
+    try
+        D = load(fname, 'synergyData', 'percentTime', 'expDates', 'nameList');
+        expDates = datetime(cellstr(D.expDates), 'InputFormat','yyMMdd');
+        daysDiff = days(expDates - ttDate);
+        t = D.percentTime;
+        
+        for i = 1:length(focusList)
+            idx = find(strcmp(focusList{i}, D.nameList));
+            
+            if ~isempty(idx)
+                numDays = length(expDates);
+                muscleDataM = zeros(length(t), numDays);
+                validDays = false(1, numDays);
+                
+                for dayI = 1:numDays
+                    dailyData = D.synergyData{idx, dayI};
+                    if ~isempty(dailyData)
+                        % Robust Mean Calculation
+                        % dailyData might be [trials x time] or [time x trials]
+                        if size(dailyData, 2) == length(t)
+                             meanProfile = mean(dailyData, 1, 'omitnan')';
+                        elseif size(dailyData, 1) == length(t)
+                             meanProfile = mean(dailyData, 2, 'omitnan');
+                        else
+                             % Last resort: check elements
+                             if numel(dailyData) == length(t)
+                                 meanProfile = dailyData(:);
+                             else
+                                 meanProfile = [];
+                             end
+                        end
+                        
+                        if ~isempty(meanProfile)
+                            muscleDataM(:, dayI) = meanProfile;
+                            validDays(dayI) = true;
+                        end
+                    end
                 end
                 
-                % Ensure length matches t
-                if length(meanProfile) == length(t)
-                    muscleDataM(:, dayI) = meanProfile;
-                    validDays(dayI) = true;
-                end
+                dataAll(i).t = t;
+                dataAll(i).dataM = muscleDataM(:, validDays);
+                dataAll(i).daysDiff = daysDiff(validDays);
             end
         end
-        
-        dataAll(i).t = t;
-        if ~isempty(muscleDataM)
-            dataAll(i).dataM = muscleDataM(:, validDays);
-            dataAll(i).daysDiff = daysDiff(validDays);
-        else
-            dataAll(i).dataM = [];
-            dataAll(i).daysDiff = [];
-        end
+    catch ME
+        warning('Error loading %s: %s', fname, ME.message);
     end
 end

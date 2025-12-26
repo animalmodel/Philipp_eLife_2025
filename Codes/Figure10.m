@@ -1,5 +1,5 @@
 % =========================================================================
-% SCRIPT: Plot_Figure10_SynergyCD_v44.m
+% SCRIPT: Figure10.m
 %
 % PURPOSE: 
 %   Generates Figure 10: Synergy C & D Cross-Correlation Analysis.
@@ -17,7 +17,12 @@ clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+% --- DYNAMIC PATH SETUP ---
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % Input Directories
 matDir    = fullfile(baseDir, 'Data', 'synergy'); 
@@ -25,7 +30,13 @@ behDirA   = fullfile(baseDir, 'Data', 'behavior', 'data_M1', 'real_mov_time - co
 behDirB   = fullfile(baseDir, 'Data', 'behavior', 'data_M2', 'plateTouch');
 
 % Output Directory
-fullfile(baseDir, 'outputFigures_Fig10');
+outFigDir = fullfile(baseDir, 'outputFigures_Fig10');
+if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
+
+% Verify Data
+if ~exist(matDir, 'dir')
+    error('Data folder not found at: %s\n(Did you download the ''Data'' folder from GitHub?)', matDir); 
+end
 
 % Settings
 calcType = 'Synergy'; 
@@ -143,6 +154,14 @@ for mIndx = 1:2
     yyaxis(ax4, 'right'); ylabel(ax4, 'Contact Time (ms)');
 end
 
+% Save
+try
+    print(fig, fullfile(outFigDir, 'Figure10_SynergyCD_Corr.svg'), '-dsvg', '-painters');
+    fprintf('Figure 10 saved to: %s\n', outFigDir);
+catch
+    exportgraphics(fig, fullfile(outFigDir, 'Figure10_SynergyCD_Corr.png'), 'Resolution', 300);
+    fprintf('SVG save failed. Figure available in PNG at: %s\n', outFigDir);
+end
 disp('Figure 10 generated successfully.');
 
 %% ========================================================================

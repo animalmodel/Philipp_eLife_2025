@@ -1,26 +1,31 @@
 % =========================================================================
-% SCRIPT: Plot_Figure13_Tenodesis.m
+% SCRIPT: Figure13.m (Tenodesis Coupling)
 %
 % PURPOSE: 
 %   Generates Figure 13: Tenodesis Coupling Analysis (Wrist vs MCP Angles).
 %   Analyze kinematic coupling refinement in Monkey B over 11 sessions.
 %
 % LAYOUT (AllDays Option):
-%   - Facet Grid: 11 individual day plots arranged in rows (5, 3, 3).
+%   - Facet Grid: 11 individual day plots arranged in rows.
 %   - Combined Plot: One large plot aggregating all days (Bottom Right).
 %
 % INPUT FILES:
 %   - MP-joint_angles.xlsx (MCP Data)
 %   - MP-wrist_angles.xlsx (Wrist Data)
 %
-% AUTHOR: Roland
+% AUTHOR: Roland Philipp
 % =========================================================================
 
 clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+% --- DYNAMIC PATH SETUP ---
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % Input Directory
 dataDir = fullfile(baseDir, 'Data', 'kinematics');
@@ -30,6 +35,11 @@ fileWrist = 'MP-wrist_angles.xlsx';
 % Output Directory
 outFigDir =  fullfile(baseDir, 'outputFigures_Fig13');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
+
+% Verify Data
+if ~exist(dataDir, 'dir')
+    error('Data folder not found at: %s\n(Did you download the ''Data'' folder from GitHub?)', dataDir); 
+end
 
 % Analysis Settings
 plotOption = 'AllDays'; % 'LandmarkDays' or 'AllDays'
@@ -166,12 +176,10 @@ if saveFig
     exportgraphics(fig, [fNameBase '.png'], 'Resolution', 300);
     
     % Save Vector (Robust Method)
-    % Uses 'print' instead of exportgraphics for better SVG compatibility
     try
         print(fig, [fNameBase '.svg'], '-dsvg', '-painters');
         fprintf('Saved SVG: %s\n', [fNameBase '.svg']);
     catch
-        % Fallback to PDF if SVG fails (Illustrator accepts PDF vectors)
         exportgraphics(fig, [fNameBase '.pdf'], 'ContentType', 'vector');
         fprintf('SVG failed. Saved PDF instead: %s\n', [fNameBase '.pdf']);
     end

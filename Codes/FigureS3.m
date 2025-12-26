@@ -19,9 +19,13 @@ clear; clc; close all;
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
 scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
 baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
+
 matDir = fullfile(baseDir, 'Data', 'emg', 'emg_mat');
-outFigDir = fullfile(scriptPath, 'outputFigures_S3');
+outFigDir = fullfile(baseDir, 'outputFigures_S3');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
 if ~exist(matDir, 'dir'), error('Data directory not found: %s', matDir); end
@@ -119,8 +123,12 @@ end
 
 
 % --- Finalize and Save ---
-exportgraphics(f, fullfile(outFigDir, 'FigureS3.png'), 'Resolution', 300);
-fprintf('Figure S3 saved to: %s\n', fullfile(outFigDir, 'FigureS3.png'));
+try
+    exportgraphics(f, fullfile(outFigDir, 'FigureS3.png'), 'Resolution', 300);
+    fprintf('Figure S3 saved to: %s\n', fullfile(outFigDir, 'FigureS3.png'));
+catch
+    fprintf('Warning: Could not save PNG. Check permissions.\n');
+end
 
 
 %% ========================================================================

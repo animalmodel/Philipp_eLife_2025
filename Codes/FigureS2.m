@@ -7,18 +7,23 @@
 %   - Right Cols: Post-surgery individual days (color-coded).
 %
 % UPDATES:
+%   - Dynamic path detection added.
 %   - Fixed Monkey A missing FDS/EDC (used 'FDSdist'/'EDCdist').
 %   - Removed Post-Surgery panels for FDS, FCU, and FCR in Monkey B.
 %
-% AUTHORS: Roland Philipp
+% AUTHOR: Roland Philipp
 % =========================================================================
 
 clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
+% --- DYNAMIC PATH SETUP ---
 scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
 baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % Force calculation type to EMG
 calcType = 'EMG';
@@ -27,12 +32,12 @@ calcType = 'EMG';
 matDir = fullfile(baseDir, 'Data', 'emg', 'emg_mat');
 
 % Set output directory
-outFigDir = fullfile(scriptPath, 'outputFigures_S2');
+outFigDir = fullfile(baseDir, 'outputFigures_S2');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
 
 % Verify data directory exists
 if ~exist(matDir, 'dir')
-    error('Data directory not found: %s', matDir);
+    error('Data folder not found at: %s\n(Did you download the ''Data'' folder from GitHub?)', matDir);
 end
 
 monkeyNameList = {'Yachimun', 'Seseki'};
@@ -189,8 +194,12 @@ for mIndx = 1:2
     end
     
     % Save figure
-    exportgraphics(f, fullfile(outFigDir, [monkeyName '_FigureS2.png']), 'Resolution', 300);
-    fprintf('Figure saved to: %s\n', fullfile(outFigDir, [monkeyName '_FigureS2.png']));
+    try
+        exportgraphics(f, fullfile(outFigDir, [monkeyName '_FigureS2.png']), 'Resolution', 300);
+        fprintf('Figure saved to: %s\n', fullfile(outFigDir, [monkeyName '_FigureS2.png']));
+    catch
+        fprintf('Warning: Could not save PNG for %s. Check permissions.\n', monkeyName);
+    end
 end
 
 %% ========================================================================

@@ -2,10 +2,11 @@
 % SCRIPT: Figure6.m
 %
 % PURPOSE: 
-% potting figure 6
+% Potting figure 6: EMG Profiles and Cross-Correlation Analysis
 %
-% UPDATES:
-%   - Monkey B Cross-Corr: Plotted in Column 4 (Stacked), not wide.
+% UPDATED:
+%   - Dynamic path detection for GitHub portability.
+%   - Monkey B Cross-Corr: Plotted in Column 4 (Stacked).
 %   - Post-Surgery EMG: Plots ONLY Landmark Days.
 %   - Behavioral lines disconnected (Pre/Post).
 %   - Y-Axis limits fixed (0 to Inf).
@@ -17,7 +18,14 @@ clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+% --- DYNAMIC PATH SETUP ---
+% Automatically detects the folder this script is in (e.g., .../Codes)
+% and sets the base directory to the parent folder (e.g., .../Philipp_eLife_2025)
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
+
+fprintf('Detected Base Directory: %s\n', baseDir);
 
 % --- Paths ---
 dirEMG     = fullfile(baseDir, 'Data', 'emg','emg_xls');

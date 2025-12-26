@@ -1,8 +1,8 @@
 % =========================================================================
-% SCRIPT: Plot_FigureS6_EMGLag.m
+% SCRIPT: FigureS1.m
 %
 % PURPOSE: 
-%   Generates Figure S6: EMG Lag Analysis (Peak Correlation Timing).
+%   Generates Figure S1: EMG Lag Analysis (Peak Correlation Timing).
 %   Layout: Fixed 4x2 Grid (Monkey A Top, Monkey B Bottom).
 %
 % STYLING:
@@ -16,16 +16,27 @@ clear; clc; close all;
 
 %% 1. CONFIGURATION & PATHS
 % -------------------------------------------------------------------------
-baseDir = 'C:\Users\mypre\Documents\Manuscripts\Revision\post acceptance revision\Philipp_eLife_2025';
+% --- DYNAMIC PATH SETUP ---
+scriptPath = fileparts(mfilename('fullpath'));
+if isempty(scriptPath), scriptPath = pwd; end % Fallback for running sections
+baseDir = fileparts(scriptPath); 
 
-% Input Directories (Note: Using 'Fig.S9' folder for EMG/Synergy mat files is common in your structure)
-matDir  = fullfile(baseDir, 'Data', 'emg','emg_mat'); 
-behDirA = fullfile(baseDir, 'Data', 'data_M1', 'real_mov_time - contains ATAXIA data');
-behDirB = fullfile(baseDir, 'Data', 'data_M2', 'plateTouch');
+fprintf('Detected Base Directory: %s\n', baseDir);
+
+% Input Directories
+matDir  = fullfile(baseDir, 'Data', 'emg', 'emg_mat'); 
+% Note: Updated to include 'behavior' folder to match other scripts
+behDirA = fullfile(baseDir, 'Data', 'behavior', 'data_M1', 'real_mov_time - contains ATAXIA data');
+behDirB = fullfile(baseDir, 'Data', 'behavior', 'data_M2', 'plateTouch');
 
 % Output Directory
-outFigDir =  fullfile(baseDir, 'outputFigures_FigS1');
+outFigDir = fullfile(baseDir, 'outputFigures_FigS1');
 if ~exist(outFigDir, 'dir'), mkdir(outFigDir); end
+
+% Verify Data
+if ~exist(matDir, 'dir')
+    error('Data folder not found at: %s\n(Did you download the ''Data'' folder from GitHub?)', matDir); 
+end
 
 % Settings
 calcType = 'EMG'; 
@@ -64,7 +75,7 @@ landmarkDaysA = [29, 64, 69, 79, 99];
 landmarkDaysB = [22, 36, 44, 48, 64];
 
 % A4 Dimensions (Vertical 13.5 x 27 cm)
-fig = figure('Name', 'Figure S6: EMG Lag', 'Units', 'centimeters', ...
+fig = figure('Name', 'Figure S1: EMG Lag', 'Units', 'centimeters', ...
              'Position', [2 1 13.5 27], 'Color', 'w');
 
 t = tiledlayout(4, 2, 'TileSpacing', 'tight', 'Padding', 'compact');
@@ -125,12 +136,12 @@ for mIndx = 1:2
 end
 
 % Save
-exportgraphics(fig, fullfile(outFigDir, 'Figure_S6_EMGLag.png'), 'Resolution', 300);
 try
-    print(fig, fullfile(outFigDir, 'Figure_S6_EMGLag.svg'), '-dsvg', '-painters');
-    fprintf('Figure S6 saved to: %s\n', outFigDir);
+    print(fig, fullfile(outFigDir, 'FigureS1_EMGLag.svg'), '-dsvg', '-painters');
+    fprintf('Figure S1 saved to: %s\n', outFigDir);
 catch
-    fprintf('SVG save failed. Figure available in PNG format.\n');
+    exportgraphics(fig, fullfile(outFigDir, 'FigureS1_EMGLag.png'), 'Resolution', 300);
+    fprintf('SVG save failed. Saved PNG to: %s\n', outFigDir);
 end
 
 
