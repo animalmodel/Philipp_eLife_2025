@@ -57,6 +57,7 @@ Directory Structure:
 
 📜 List of Scripts (Current Release)
 Main Figures
+Figure2.m: Long term confirmation by ultrasound
 Figure5.m: Behavioral and kinematic metrics (Success rate, Retrieval time).
 Figure6.m: Temporal EMG profiles and Cross-Correlation (CC) analysis.
 Figure7.m: Primary Synergies (A/B) - Spatial structure & activation patterns.
@@ -82,6 +83,7 @@ FigureS9.m: Evolution of Time Lag at Peak CC (Synergy).
 © 2025 Roland Philipp. All rights reserved.
 Permission is hereby granted to use, reproduce, and modify this code and data for academic, educational, and other non-commercial research purposes only.
 This code and data are provided "as is", without warranty of any kind, express or implied. The authors shall not be liable for any damages arising from the use of this software.
+
 
 
 
