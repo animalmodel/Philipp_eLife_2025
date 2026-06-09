@@ -79,12 +79,25 @@ FigureS7.m: Time-varying activation profiles.
 FigureS8.m: Synergy activation comparison (Pre-surgery vs. Final recovery).
 FigureS9.m: Evolution of Time Lag at Peak CC (Synergy).
 
-🛡️ License
-© 2025 Roland Philipp. All rights reserved.
-Permission is hereby granted to use, reproduce, and modify this code and data for academic, educational, and other non-commercial research purposes only.
-This code and data are provided "as is", without warranty of any kind, express or implied. The authors shall not be liable for any damages arising from the use of this software.
+🛡️ MIT License
+© 2025 Roland Philipp.
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 
